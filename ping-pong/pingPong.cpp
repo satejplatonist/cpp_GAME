@@ -17,13 +17,27 @@ public:
 		DrawCircle(posx, posy, radius,SB_Color);
 	}
 	int getPosY() { return posy; }
-	void update()
+	void update(int& PLAYER_Score,int& CPU_Score)
 	{
 		posx += speedX;
 		posy += speedY;
 
-		if (posx + radius >= GetScreenWidth()-25 || posx - radius <= 25)
+		if (posx + radius >= GetScreenWidth()-25)
 		{
+			if (posy + radius >= GetScreenHeight() / 2 - 180 && posy + radius <= GetScreenHeight() / 2 + 180)
+			{
+				CPU_Score++;
+				reset();
+			}
+			speedX *= -1;
+		}
+		else if (posx - radius <= 25)
+		{
+			if (posy + radius >= GetScreenHeight() / 2 - 180 && posy + radius <= GetScreenHeight() / 2 + 180)
+			{
+				PLAYER_Score++;
+				reset();
+			}
 			speedX *= -1;
 		}
 		else if (posy + radius >= GetScreenHeight()-25 || posy - radius <= 25)
@@ -38,7 +52,11 @@ private:
 		posx = x; posy = y;
 		radius = r;
 		SB_Color = color;
-	}	
+	}
+	void reset()
+	{
+		Ball(GetScreenWidth() - 700, GetScreenHeight() - 700, 15, WHITE);
+	}
 };
 
 struct Paddle
@@ -182,7 +200,7 @@ int main()
 		GoalPost g2{ screenWidth - 25,screenHeight / 2 - 180,25,360,WHITE };
 
 		
-		b.update();
+		b.update(PLAYER_Score,CPU_Score);
 		
 		p1.update();
 		cp2.update(b.getPosY());
@@ -190,22 +208,12 @@ int main()
 		if (CheckCollisionCircleRec(Vector2{ static_cast<float>(b.posx),static_cast<float>(b.posy) }, b.radius,
 			Rectangle{ static_cast<float>(p1.posx),static_cast<float>(p1.posy),static_cast<float>(p1.width),static_cast<float>(p1.height) }))
 		{
-			if (CheckCollisionCircleRec(Vector2{ static_cast<float>(b.posx),static_cast<float>(b.posy) }, b.radius,
-				Rectangle{ static_cast<float>(g1.posx),static_cast<float>(g1.posy),static_cast<float>(g1.width),static_cast<float>(g1.height) }))
-			{
-				++CPU_Score;
-			}
 			b.speedX *= -1;
 		}
 
 		if (CheckCollisionCircleRec(Vector2{ static_cast<float>(b.posx),static_cast<float>(b.posy) }, b.radius,
 			Rectangle{ static_cast<float>(cp2.posx),static_cast<float>(cp2.posy),static_cast<float>(cp2.width),static_cast<float>(cp2.height) }))
 		{
-			if (CheckCollisionCircleRec(Vector2{ static_cast<float>(b.posx),static_cast<float>(b.posy) }, b.radius,
-				Rectangle{ static_cast<float>(g2.posx),static_cast<float>(g2.posy),static_cast<float>(g2.width),static_cast<float>(g2.height) }))
-			{
-				++PLAYER_Score;
-			}
 			b.speedX *= -1;
 		}
 
